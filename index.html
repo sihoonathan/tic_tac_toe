@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <section id="choice">
+      <button data-type="O">O</button>
+      <button data-type="X">X</button>
+    </section>
+    <section id="mainBoard">
+      <div data-row="1" data-col="1"></div>
+      <div data-row="1" data-col="2"></div>
+      <div data-row="1" data-col="3"></div>
+      <div data-row="2" data-col="1"></div>
+      <div data-row="2" data-col="2"></div>
+      <div data-row="2" data-col="3"></div>
+      <div data-row="3" data-col="1"></div>
+      <div data-row="3" data-col="2"></div>
+      <div data-row="3" data-col="3"></div>
+    </section>
+    <section>
+      <p id="message"></p>
+    </section>
+    <script>
+      let player = null;
+      let opponent = null;
+      let turn = null;
+      
+      const switchTurn = () => {
+          if (turn === player) turn = opponent;
+          else turn = player;
+      };
+
+      const checkWinner = () => {
+          let foundWinner = false;
+          let divs = document.querySelectorAll("#mainBoard > div");
+          
+          //checks for row winning pattern
+          for (let row = 1; row <= 3; row++) {
+              let possibleWinner = []
+              for (let col = 1; col <= 3; col++) {
+                  let matchedDiv;
+                  divs.forEach(div => {
+                      if (div.dataset.row == row && div.dataset.col == col) {
+                          matchedDiv = div;
+                      }
+                  });
+                  possibleWinner.push(matchedDiv.innerText);
+              }
+              
+              for (let i = 0; i < possibleWinner.length - 1; i++) {
+                  // debugger;
+                  let curr = possibleWinner[i];
+                  let next = possibleWinner[i + 1]
+                  
+                  if (curr != next || curr == "") {
+                      break;
+                  }
+                  if (i == possibleWinner.length - 2) {
+                      foundWinner = true;
+                  }
+              }
+          }
+          
+          //checks for column winning pattern
+          for (let col = 1; col <= 3; col++) {
+              let possibleWinner = []
+              for (let row = 1; row <= 3; row++) {
+                  let matchedDiv;
+                  divs.forEach(div => {
+                      if (div.dataset.row == row && div.dataset.col == col) {
+                          matchedDiv = div;
+                      }
+                  });
+                  possibleWinner.push(matchedDiv.innerText);
+              }
+
+              for (let i = 0; i < possibleWinner.length - 1; i++) {
+                  // debugger;
+                  let curr = possibleWinner[i];
+                  let next = possibleWinner[i + 1]
+
+                  if (curr != next || curr == "") {
+                      break;
+                  }
+                  if (i == possibleWinner.length - 2) {
+                      foundWinner = true;
+                  }
+              }
+          }
+          
+          
+          //
+          for (let row = 1; row <= 3; row++) {
+              let possibleWinner = [];
+              
+              for (let col = row; col ; col++) {
+                  let matchedDiv;
+                  divs.forEach(div => {
+                      if (div.dataset.row == row && div.dataset.col == col) {
+                          matchedDiv = div;
+                      }
+                  });
+                  possibleWinner.push(matchedDiv.innerText);
+              }
+
+              for (let i = 0; i < possibleWinner.length - 1; i++) {
+                  // debugger;
+                  let curr = possibleWinner[i];
+                  let next = possibleWinner[i + 1]
+
+                  if (curr != next || curr == "") {
+                      break;
+                  }
+                  if (i == possibleWinner.length - 2) {
+                      foundWinner = true;
+                  }
+              }
+          }
+          
+          return foundWinner;
+      };
+      
+      const gameBoard = (() => {
+          
+          const btns = document.querySelectorAll('#choice > button');
+          btns.forEach(btn => {
+              btn.addEventListener('click', () => {
+                  if (player == null) {
+                      player = Player(btn.dataset.type);
+                      opponent = (player.type == 'O' ? Player('X') : Player('O'));
+                      turn = player;
+                  }
+              })
+          });
+          
+          const board = [];
+          let boxes = document.querySelectorAll('#mainBoard > div');
+          boxes.forEach(box => {
+              box.addEventListener('click', () => {
+                  let row = box.dataset.row;
+                  let col = box.dataset.col;
+                  
+                  outer:
+                      for (let i = 0; i < 1; i++) {
+                        for (let move of gameBoard) {
+                          if (move.row == row && move.col == col) {
+                              break outer;
+                          }
+                        }
+                          turn.addMove(row, col);
+                          board.push(turn.moves[turn.moves.length-1]);
+                          if (!checkWinner()) {
+                              renderBoard();
+                          }
+                          if (checkWinner()) {
+                              let msg = document.querySelector("#message");
+                              msg.innerHTML = `Winner is '${turn.type}' player`;
+                              break outer;
+                          };
+                          switchTurn();
+                      }
+              })
+          });
+          
+          return board;
+      })();
+      
+      const Player = (type) => {
+          const moves = [];
+          const addMove = (row, col) => {
+              moves.push({type, row, col})
+          };
+          return {type, moves, addMove};
+      };
+      
+      const renderBoard = () => {
+          for (let move of gameBoard) {
+              let playedBox = document.querySelector(`[data-row="${move.row}"][data-col="${move.col}"]`);
+              playedBox.innerHTML = move.type;
+          }
+      }
+      
+    </script>
+  </body>
+</html>
