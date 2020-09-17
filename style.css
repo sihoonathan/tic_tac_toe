@@ -59,9 +59,45 @@ table {
     box-sizing: border-box;
 }
 
+body {
+    text-align: center;
+    font-family: 'Grandstander', cursive;
+    font-weight: 800;
+    font-size: 40px;
+    background-color: #6ACBA3;
+}
+
+header {
+    margin-top: 5vh;
+    height: 10vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#choice {
+    height: 10vh;
+}
+
+#choice > button {
+    width: 40px;
+    height: 40px;
+    font-size: 30px;
+    transition: all 0.3s ease-in-out;
+    border: 2px solid gray;
+    outline: none;
+    border-radius: 10px;
+}
+
+#choice > button:hover {
+    background-color: #f06e57;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
 #mainBoard {
     display: grid;
-    height: 100vh;
+    height: 55vh;
     grid-template-columns: 100px 100px 100px;
     grid-template-rows: 100px 100px 100px;
     justify-content: center;
@@ -69,7 +105,15 @@ table {
 }
 
 #mainBoard > div {
-    outline: 1px solid black;
-    margin-top: 1px;
-    margin-left: 1px;
+    outline: 5px solid black;
+    margin-top: 5px;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#footer {
+    margin-top: 5vh;
+    height: 5vh;
 }

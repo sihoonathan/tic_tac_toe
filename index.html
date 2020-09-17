@@ -5,8 +5,13 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>Title</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Grandstander:wght@300;800&display=swap" rel="stylesheet">
+
   </head>
   <body>
+    <header>
+      <p>Tic-Tac-Toe</p>
+    </header>
     <section id="choice">
       <button data-type="O">O</button>
       <button data-type="X">X</button>
@@ -22,7 +27,7 @@
       <div data-row="3" data-col="2"></div>
       <div data-row="3" data-col="3"></div>
     </section>
-    <section>
+    <section id="footer">
       <p id="message"></p>
     </section>
     <script>
@@ -190,6 +195,9 @@
                               msg.innerHTML = `Winner is '${turn.type}' player`;
                               break outer;
                           };
+                          
+                          checkDraw();
+                          
                           switchTurn();
                       }
               })
@@ -210,6 +218,13 @@
           for (let move of gameBoard) {
               let playedBox = document.querySelector(`[data-row="${move.row}"][data-col="${move.col}"]`);
               playedBox.innerHTML = move.type;
+          }
+      }
+      
+      const checkDraw = () => {
+          if (gameBoard.length == 9 && checkWinner() == false) {
+              let msg = document.querySelector("#message");
+              msg.innerHTML = "DRAW!";
           }
       }
       
