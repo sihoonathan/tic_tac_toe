@@ -92,35 +92,63 @@
                   }
               }
           }
+
+          let start = 1;
+          let end = 3;
+
+          //Checks for right diagonal winning pattern
+          let possibleWinner = [];
+          for (let row = start; row <= end; row++) {
+              let col = row;
+              let matchedDiv;
+              divs.forEach(div => {
+                  if (div.dataset.row == row && div.dataset.col == col) {
+                      matchedDiv = div;
+                  }
+              });
+              possibleWinner.push(matchedDiv.innerText);
+          }
           
-          
-          //
-          for (let row = 1; row <= 3; row++) {
-              let possibleWinner = [];
-              
-              for (let col = row; col ; col++) {
-                  let matchedDiv;
-                  divs.forEach(div => {
-                      if (div.dataset.row == row && div.dataset.col == col) {
-                          matchedDiv = div;
-                      }
-                  });
-                  possibleWinner.push(matchedDiv.innerText);
+          for (let i = 0; i < possibleWinner.length - 1; i++) {
+              // debugger;
+              let curr = possibleWinner[i];
+              let next = possibleWinner[i + 1]
+
+              if (curr != next || curr == "") {
+                  break;
               }
-
-              for (let i = 0; i < possibleWinner.length - 1; i++) {
-                  // debugger;
-                  let curr = possibleWinner[i];
-                  let next = possibleWinner[i + 1]
-
-                  if (curr != next || curr == "") {
-                      break;
-                  }
-                  if (i == possibleWinner.length - 2) {
-                      foundWinner = true;
-                  }
+              if (i == possibleWinner.length - 2) {
+                  foundWinner = true;
               }
           }
+          
+          //Checks for left diagonal winning pattern
+          possibleWinner = [];
+          for (let row = start; row <= end; row++) {
+              let col = 4 - row;
+              let matchedDiv;
+              divs.forEach(div => {
+                  if (div.dataset.row == row && div.dataset.col == col) {
+                      matchedDiv = div;
+                  }
+              });
+              possibleWinner.push(matchedDiv.innerText);
+          }
+          for (let i = 0; i < possibleWinner.length - 1; i++) {
+              // debugger;
+              let curr = possibleWinner[i];
+              let next = possibleWinner[i + 1]
+
+              if (curr != next || curr == "") {
+                  break;
+              }
+              if (i == possibleWinner.length - 2) {
+                  foundWinner = true;
+              }
+          }
+          
+          //
+          
           
           return foundWinner;
       };
