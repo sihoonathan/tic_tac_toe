@@ -16,6 +16,9 @@
       <button data-type="O">O</button>
       <button data-type="X">X</button>
     </section>
+    <section>
+      <button id="reset">Reset</button>
+    </section>
     <section id="mainBoard">
       <div data-row="1" data-col="1"></div>
       <div data-row="1" data-col="2"></div>
@@ -158,23 +161,44 @@
           return foundWinner;
       };
       
+      const reset = () => {
+          gameBoard.splice(0, gameBoard.length);
+          // debugger;
+          let msg = document.querySelector("#message");
+          msg.innerHTML = "";
+          renderBoard();
+
+      };
+      
       const gameBoard = (() => {
-          
+
+          const resetBtn = document.querySelector('#reset');
+          resetBtn.addEventListener('click', reset);
+
           const btns = document.querySelectorAll('#choice > button');
+
           btns.forEach(btn => {
               btn.addEventListener('click', () => {
-                  if (player == null) {
+                  btn.classList.add('bigger');
+                  
+                  if (board.length == 0) {
                       player = Player(btn.dataset.type);
                       opponent = (player.type == 'O' ? Player('X') : Player('O'));
                       turn = player;
                   }
               })
+              
+              btn.addEventListener('transitionend', () => {
+                  btn.classList.remove('bigger');
+              })
           });
-          
           const board = [];
+
           let boxes = document.querySelectorAll('#mainBoard > div');
           boxes.forEach(box => {
               box.addEventListener('click', () => {
+
+                  
                   let row = box.dataset.row;
                   let col = box.dataset.col;
                   
@@ -215,11 +239,17 @@
       };
       
       const renderBoard = () => {
+
+          let divs = document.querySelectorAll('#mainBoard > div');
+          divs.forEach(div => {
+              div.innerHTML = "";
+          })
+          
           for (let move of gameBoard) {
               let playedBox = document.querySelector(`[data-row="${move.row}"][data-col="${move.col}"]`);
               playedBox.innerHTML = move.type;
           }
-      }
+      };
       
       const checkDraw = () => {
           if (gameBoard.length == 9 && checkWinner() == false) {
