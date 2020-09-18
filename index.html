@@ -9,6 +9,7 @@
 
   </head>
   <body>
+    <div id="overlay"></div>
     <header>
       <p>Tic-Tac-Toe</p>
     </header>
@@ -16,8 +17,8 @@
       <button data-type="O">O</button>
       <button data-type="X">X</button>
     </section>
-    <section>
-      <button id="reset">Reset</button>
+    <section id="resetSec" class="displayNone">
+      <button id="reset">Play Again</button>
     </section>
     <section id="mainBoard">
       <div data-row="1" data-col="1"></div>
@@ -30,8 +31,8 @@
       <div data-row="3" data-col="2"></div>
       <div data-row="3" data-col="3"></div>
     </section>
-    <section id="footer">
-      <p id="message"></p>
+    <section id="footer" class="displayNone">
+      <p id="message">Hi</p>
     </section>
     <script>
       let player = null;
@@ -49,7 +50,8 @@
           
           //checks for row winning pattern
           for (let row = 1; row <= 3; row++) {
-              let possibleWinner = []
+              let possibleWinner = [];
+              let winnerDivs = [];
               for (let col = 1; col <= 3; col++) {
                   let matchedDiv;
                   divs.forEach(div => {
@@ -58,6 +60,7 @@
                       }
                   });
                   possibleWinner.push(matchedDiv.innerText);
+                  winnerDivs.push(matchedDiv);
               }
               
               for (let i = 0; i < possibleWinner.length - 1; i++) {
@@ -70,6 +73,9 @@
                   }
                   if (i == possibleWinner.length - 2) {
                       foundWinner = true;
+                      for (let each of winnerDivs) {
+                          each.classList.add('winnerColor');
+                      }
                   }
               }
           }
@@ -77,6 +83,8 @@
           //checks for column winning pattern
           for (let col = 1; col <= 3; col++) {
               let possibleWinner = []
+              let winnerDivs = [];
+              
               for (let row = 1; row <= 3; row++) {
                   let matchedDiv;
                   divs.forEach(div => {
@@ -85,6 +93,8 @@
                       }
                   });
                   possibleWinner.push(matchedDiv.innerText);
+                  winnerDivs.push(matchedDiv);
+
               }
 
               for (let i = 0; i < possibleWinner.length - 1; i++) {
@@ -97,6 +107,9 @@
                   }
                   if (i == possibleWinner.length - 2) {
                       foundWinner = true;
+                      for (let each of winnerDivs) {
+                          each.classList.add('winnerColor');
+                      }
                   }
               }
           }
@@ -106,6 +119,8 @@
 
           //Checks for right diagonal winning pattern
           let possibleWinner = [];
+          let winnerDivs = [];
+
           for (let row = start; row <= end; row++) {
               let col = row;
               let matchedDiv;
@@ -115,6 +130,8 @@
                   }
               });
               possibleWinner.push(matchedDiv.innerText);
+              winnerDivs.push(matchedDiv);
+
           }
           
           for (let i = 0; i < possibleWinner.length - 1; i++) {
@@ -127,11 +144,16 @@
               }
               if (i == possibleWinner.length - 2) {
                   foundWinner = true;
+                  for (let each of winnerDivs) {
+                      each.classList.add('winnerColor');
+                  }
               }
           }
           
           //Checks for left diagonal winning pattern
           possibleWinner = [];
+          winnerDivs = [];
+
           for (let row = start; row <= end; row++) {
               let col = 4 - row;
               let matchedDiv;
@@ -141,6 +163,8 @@
                   }
               });
               possibleWinner.push(matchedDiv.innerText);
+              winnerDivs.push(matchedDiv);
+
           }
           for (let i = 0; i < possibleWinner.length - 1; i++) {
               // debugger;
@@ -152,6 +176,9 @@
               }
               if (i == possibleWinner.length - 2) {
                   foundWinner = true;
+                  for (let each of winnerDivs) {
+                      each.classList.add('winnerColor');
+                  }
               }
           }
           
@@ -162,21 +189,33 @@
       };
       
       const reset = () => {
+          document.querySelector('#resetSec').classList.add('displayNone');
+          document.querySelector('#footer').classList.add('displayNone');
+          document.querySelector('#overlay').classList.remove('overlay');
           gameBoard.splice(0, gameBoard.length);
           // debugger;
           let msg = document.querySelector("#message");
           msg.innerHTML = "";
+          let divs = document.querySelectorAll('div');
+          divs.forEach(div => {
+              div.classList.remove('winnerColor');
+          })
           renderBoard();
-
       };
       
       const gameBoard = (() => {
 
           const resetBtn = document.querySelector('#reset');
           resetBtn.addEventListener('click', reset);
-
+          resetBtn.addEventListener('click', () => {
+              
+              resetBtn.classList.add('bigger');
+          });
+          resetBtn.addEventListener('transitionend', () => {
+              resetBtn.classList.remove('bigger');
+          });
           const btns = document.querySelectorAll('#choice > button');
-
+         
           btns.forEach(btn => {
               btn.addEventListener('click', () => {
                   btn.classList.add('bigger');
@@ -189,6 +228,7 @@
               })
               
               btn.addEventListener('transitionend', () => {
+                  // debugger
                   btn.classList.remove('bigger');
               })
           });
@@ -196,8 +236,25 @@
 
           let boxes = document.querySelectorAll('#mainBoard > div');
           boxes.forEach(box => {
+              
+              box.addEventListener('mouseover', () => {
+                  if (box.innerHTML == "" && !checkWinner()) {
+                      box.innerHTML = turn.type;
+                      box.classList.add('dim');
+                  }
+                  
+              });
+              
+              box.addEventListener('mouseout', () => {
+                  if (box.classList.contains('dim')) {
+                      box.innerHTML = "";
+                      box.classList.remove('dim');
+                  }
+              })
+              
               box.addEventListener('click', () => {
-
+                  box.innerHTML = "";
+                  box.classList.remove('dim');
                   
                   let row = box.dataset.row;
                   let col = box.dataset.col;
@@ -217,6 +274,10 @@
                           if (checkWinner()) {
                               let msg = document.querySelector("#message");
                               msg.innerHTML = `Winner is '${turn.type}' player`;
+
+                              document.querySelector('#resetSec').classList.remove('displayNone');
+                              document.querySelector('#footer').classList.remove('displayNone');
+                              document.querySelector('#overlay').classList.add('overlay');
                               break outer;
                           };
                           
@@ -255,8 +316,13 @@
           if (gameBoard.length == 9 && checkWinner() == false) {
               let msg = document.querySelector("#message");
               msg.innerHTML = "DRAW!";
+              document.querySelector('#resetSec').classList.remove('displayNone');
+              document.querySelector('#footer').classList.remove('displayNone');
+              document.querySelector('#overlay').classList.add('overlay');
           }
       }
+      
+      
       
     </script>
   </body>
