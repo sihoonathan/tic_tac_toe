@@ -74,10 +74,16 @@ header {
     justify-content: center;
     align-items: center;
     color: #3F51B5;
+    flex-direction: column;
 }
 
 #choice {
     height: 10vh;
+    margin-top: 1rem;
+}
+
+#title {
+    margin-bottom: 1rem;
 }
 
 #choice > button {
@@ -186,4 +192,8 @@ header {
     left: 0;
     right: 0;
     z-index: 2;
+}
+
+#sub {
+    font-size: 15px;
 }
