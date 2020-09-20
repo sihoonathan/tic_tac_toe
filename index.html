@@ -21,15 +21,15 @@
       <button id="reset">Play Again</button>
     </section>
     <section id="mainBoard">
-      <div data-row="1" data-col="1"></div>
-      <div data-row="1" data-col="2"></div>
-      <div data-row="1" data-col="3"></div>
-      <div data-row="2" data-col="1"></div>
-      <div data-row="2" data-col="2"></div>
-      <div data-row="2" data-col="3"></div>
-      <div data-row="3" data-col="1"></div>
-      <div data-row="3" data-col="2"></div>
-      <div data-row="3" data-col="3"></div>
+      <div data-row="1" data-col="1" data-index="0"></div>
+      <div data-row="1" data-col="2" data-index="1"></div>
+      <div data-row="1" data-col="3" data-index="2"></div>
+      <div data-row="2" data-col="1" data-index="3"></div>
+      <div data-row="2" data-col="2" data-index="4"></div>
+      <div data-row="2" data-col="3" data-index="5"></div>
+      <div data-row="3" data-col="1" data-index="6"></div>
+      <div data-row="3" data-col="2" data-index="7"></div>
+      <div data-row="3" data-col="3" data-index="8"></div>
     </section>
     <section id="footer" class="displayNone">
       <p id="message">Hi</p>
@@ -43,6 +43,95 @@
           if (turn === player) turn = opponent;
           else turn = player;
       };
+      
+      const boardRead = () => {
+          let aiBoard = [];
+          let currBoard = document.querySelectorAll('#mainBoard > div');
+          currBoard.forEach(box => {
+              box.innerHTML == "" ? aiBoard.push(Number(box.dataset.index)) : aiBoard.push(box.innerHTML);
+          })
+          
+          return aiBoard;
+      }
+      
+      // Returns the list of indexes of empty spots
+      const emptyIndex = (board) => {
+          return board.filter(box => box != 'O' && box != 'X');
+      };
+
+      function winning(board, player){
+          if (
+              (board[0] == player && board[1] == player && board[2] == player) ||
+              (board[3] == player && board[4] == player && board[5] == player) ||
+              (board[6] == player && board[7] == player && board[8] == player) ||
+              (board[0] == player && board[3] == player && board[6] == player) ||
+              (board[1] == player && board[4] == player && board[7] == player) ||
+              (board[2] == player && board[5] == player && board[8] == player) ||
+              (board[0] == player && board[4] == player && board[8] == player) ||
+              (board[2] == player && board[4] == player && board[6] == player)
+          ) {
+              return true;
+          } else {
+              return false;
+          }
+      }
+
+      function miniMax(newBoard, currPlayer) {
+          let availSpots = emptyIndex(newBoard);
+
+          if (winning(newBoard, player.type)) {
+              return {score: -10};
+          }
+          else if (winning(newBoard, opponent.type)) {
+              return {score: 10};
+          }
+          else if (availSpots.length === 0) {
+              return {score: 0};
+          }
+          
+          let moves = [];
+
+          for (let i = 0; i < availSpots.length; i++) {
+              let move = {};
+              move.index = newBoard[availSpots[i]];
+              newBoard[availSpots[i]] = currPlayer;
+
+              if (currPlayer == opponent.type) {
+                  let result = miniMax(newBoard, player.type);
+                  move.score = result.score;
+              }
+              else {
+                  let result = miniMax(newBoard, opponent.type);
+                  move.score = result.score;
+              }
+
+              newBoard[availSpots[i]] = move.index;
+
+              moves.push(move);
+          }
+          
+          let bestMove;
+          if (currPlayer == opponent.type) {
+              let bestScore = -10000;
+              for (let i = 0; i < moves.length; i++) {
+                  if (moves[i].score > bestScore) {
+                      bestScore = moves[i].score;
+                      bestMove = i;
+                  }
+              }
+          }
+          else {
+              let bestScore = 10000;
+              for (let i = 0; i < moves.length; i++) {
+                  if (moves[i].score < bestScore) {
+                      bestScore = moves[i].score;
+                      bestMove = i;
+                  }
+              }
+          }
+          
+          return moves[bestMove];
+      }
 
       const checkWinner = () => {
           let foundWinner = false;
@@ -182,9 +271,6 @@
               }
           }
           
-          //
-          
-          
           return foundWinner;
       };
       
@@ -281,7 +367,33 @@
                           };
                           
                           checkDraw();
+                          switchTurn();
+
+
+                          let currBoard = boardRead();
+                          let bestMove = miniMax(currBoard, turn.type);
                           
+                          let aiChoice = document.querySelector(`[data-index="${bestMove.index}"]`);
+                          let aiRow = aiChoice.dataset.row;
+                          let aiCol = aiChoice.dataset.col;
+                          
+
+                          turn.addMove(aiRow, aiCol);
+                          board.push(turn.moves[turn.moves.length-1]);
+                          if (!checkWinner()) {
+                              renderBoard();
+                          }
+                          if (checkWinner()) {
+                              let msg = document.querySelector("#message");
+                              msg.innerHTML = `Winner is '${turn.type}' player`;
+
+                              document.querySelector('#resetSec').classList.remove('displayNone');
+                              document.querySelector('#footer').classList.remove('displayNone');
+                              document.querySelector('#overlay').classList.add('overlay');
+                              break outer;
+                          };
+
+                          checkDraw();
                           switchTurn();
                       }
               })
@@ -320,9 +432,6 @@
               document.querySelector('#overlay').classList.add('overlay');
           }
       }
-      
-      
-      
     </script>
   </body>
 </html>
