@@ -39,7 +39,9 @@
       let player = null;
       let opponent = null;
       let turn = null;
-      
+      const board = [];
+
+
       const switchTurn = () => {
           if (turn === player) turn = opponent;
           else turn = player;
@@ -275,6 +277,8 @@
           return foundWinner;
       };
       
+      let i = 0;
+      
       const reset = () => {
           document.querySelector('#resetSec').classList.add('displayNone');
           document.querySelector('#footer').classList.add('displayNone');
@@ -288,7 +292,44 @@
               div.classList.remove('winnerColor');
           })
           renderBoard();
+
+          //
+
+         
+          
+          if (i % 2 == 0) {
+              i++;
+              // aiPlay(board);
+              let mainDivs = document.querySelectorAll('#mainBoard > div');
+              
+              let ranDiv = mainDivs[Math.floor(Math.random() * mainDivs.length)]
+              let aiRow = ranDiv.dataset.row;
+              let aiCol = ranDiv.dataset.col;
+
+
+              turn.addMove(aiRow, aiCol);
+              board.push(turn.moves[turn.moves.length-1]);
+              switchTurn();
+              renderBoard();
+          }
+          else {
+              i++;
+          }
+
       };
+      
+      const aiPlay = (board) => {
+          let currBoard = boardRead();
+          let bestMove = miniMax(currBoard, turn.type);
+
+          let aiChoice = document.querySelector(`[data-index="${bestMove.index}"]`);
+          let aiRow = aiChoice.dataset.row;
+          let aiCol = aiChoice.dataset.col;
+
+
+          turn.addMove(aiRow, aiCol);
+          board.push(turn.moves[turn.moves.length-1]);
+      }
       
       const gameBoard = (() => {
 
@@ -319,7 +360,7 @@
                   btn.classList.remove('bigger');
               })
           });
-          const board = [];
+          // const board = [];
 
           let boxes = document.querySelectorAll('#mainBoard > div');
           boxes.forEach(box => {
@@ -364,6 +405,7 @@
                               document.querySelector('#resetSec').classList.remove('displayNone');
                               document.querySelector('#footer').classList.remove('displayNone');
                               document.querySelector('#overlay').classList.add('overlay');
+
                               break outer;
                           };
                           
@@ -371,16 +413,8 @@
                           switchTurn();
 
 
-                          let currBoard = boardRead();
-                          let bestMove = miniMax(currBoard, turn.type);
+                          aiPlay(board);
                           
-                          let aiChoice = document.querySelector(`[data-index="${bestMove.index}"]`);
-                          let aiRow = aiChoice.dataset.row;
-                          let aiCol = aiChoice.dataset.col;
-                          
-
-                          turn.addMove(aiRow, aiCol);
-                          board.push(turn.moves[turn.moves.length-1]);
                           if (!checkWinner()) {
                               renderBoard();
                           }
@@ -391,6 +425,7 @@
                               document.querySelector('#resetSec').classList.remove('displayNone');
                               document.querySelector('#footer').classList.remove('displayNone');
                               document.querySelector('#overlay').classList.add('overlay');
+
                               break outer;
                           };
 
